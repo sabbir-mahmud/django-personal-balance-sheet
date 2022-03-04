@@ -1,0 +1,33 @@
+{% extends 'history/dashboard.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .controls input {
+        display: block;
+        width: 59%;
+        padding: 1%;
+        margin: 1% 0;
+        border: none;
+        border-radius: 5px;
+        background: #424b4ef2;
+        color: white;
+    }
+    .select {
+        padding: 1%;
+        display: block;
+        width: 59%;
+        border-radius: 5px;
+        border: none;
+        margin: 1% 0;
+        background: #424b4ef2;
+        color: white;
+    }
+</style>
+<section class="container mt-5">
+    <form class="forms" action="" method="post">
+        {% csrf_token %}
+        {{form|crispy}}
+        <input class="btn btn-primary my-3" type="submit" value="Submit">
+    </form>
+</section>
+{% endblock %}
