@@ -17,6 +17,13 @@ from django.contrib.auth import logout
 
 @login_required(login_url='login')
 def dashboard(request):
+    # dynamic active month and year
+    month = datetime.datetime.now().month
+    year = datetime.datetime.now().year
+    active_date(month)
+    active_year(year)
+    actived_month = Month.objects.get(active=True)
+    actived_year = Year.objects.get(active=True)
     # get user
     user = request.user
     total_earn = 0
@@ -41,24 +48,32 @@ def dashboard(request):
         monthly_expense = Expense.objects.filter(Q(user=user) & Q(month__active=True) & Q(
             year__active=True)).aggregate(Sum('amount'))['amount__sum']
 
+    prev_monthly_expense = 0
+    prev_id = actived_month.id - 1
+    prev_month = Month.objects.filter(id=prev_id).first()
+    if Expense.objects.filter(Q(user=user) & Q(month=prev_month) & Q(year__active=True)):
+        prev_monthly_expense = Expense.objects.filter(Q(user=user) & Q(month=prev_month) & Q(
+            year__active=True)).aggregate(Sum('amount'))['amount__sum']
+        print(prev_monthly_expense)
+
+    prev_monthly_income = 0
+    if Income.objects.filter(Q(user=user) & Q(month=prev_month) & Q(year__active=True)):
+        prev_monthly_income = Income.objects.filter(Q(user=user) & Q(month=prev_month) & Q(
+            year__active=True)).aggregate(Sum('amount'))['amount__sum']
+
     balance = total_earn - total_expense
 
-    # dynamic active month and year
-    month = datetime.datetime.now().month
-    year = datetime.datetime.now().year
-    active_date(month)
-    active_year(year)
-    actived_month = Month.objects.get(active=True)
-    actived_year = Year.objects.get(active=True)
+    earns = Income.objects.filter(Q(user=user) & Q(
+        month__active=True)).order_by('-id')[:5]
+    expenses = Expense.objects.filter(
+        Q(user=user) & Q(month__active=True)).order_by('-id')[:5]
 
+    # form data for add income and expense
     income_form = IncomeForm(
         initial={'user': user, 'month': actived_month, 'year': actived_year})
     expense_form = ExpenseForm(
         initial={'user': user, 'month': actived_month, 'year': actived_year})
-    earns = Income.objects.filter(user=user).order_by('-id')[:5]
-    expenses = Expense.objects.filter(user=user).order_by('-id')[:5]
     if request.method == 'POST':
-        print(request.POST)
         if 'income_details' in request.POST:
             income_form = IncomeForm(request.POST, initial={'user': user})
             if income_form.is_valid():
@@ -75,11 +90,13 @@ def dashboard(request):
         'monthly_earn': monthly_earn,
         'total_expense': total_expense,
         'monthly_expense': monthly_expense,
+        'prev_monthly_expense': prev_monthly_expense,
         'balance': balance,
-        'income_form': income_form,
-        'expense_form': expense_form,
         'earns': earns,
         'expenses': expenses,
+        'income_form': income_form,
+        'expense_form': expense_form,
+        'prev_monthly_income': prev_monthly_income,
     }
     return render(request, 'history/dashboard.html', context)
 
@@ -88,6 +105,8 @@ def dashboard(request):
 
 @login_required(login_url='login')
 def all_expenses(request):
+    actived_month = Month.objects.get(active=True)
+    actived_year = Year.objects.get(active=True)
     user = request.user
     total_earn = 0
     if Income.objects.filter(user=user):
@@ -116,6 +135,15 @@ def all_expenses(request):
     p = Paginator(expenses, 15)
     page = request.GET.get('p')
     expenses = p.get_page(page)
+    if request.method == 'POST':
+        expense_form = ExpenseForm(request.POST)
+        if expense_form.is_valid():
+            expense_form.save()
+            return redirect('expenses')
+    else:
+        expense_form = ExpenseForm(
+            initial={'user': user, 'month': actived_month, 'year': actived_year})
+
     context = {
         'expenses': expenses,
         'total_earn': total_earn,
@@ -123,6 +151,7 @@ def all_expenses(request):
         'total_expense': total_expense,
         'monthly_expense': monthly_expense,
         'balance': balance,
+        'expense_form': expense_form,
     }
     return render(request, 'history/all_expenses.html', context)
 
@@ -186,6 +215,8 @@ def delete_expense(request, pk):
 
 @login_required(login_url='login')
 def all_incomes(request):
+    actived_month = Month.objects.get(active=True)
+    actived_year = Year.objects.get(active=True)
     user = request.user
     total_earn = 0
     if Income.objects.filter(user=user):
@@ -214,6 +245,15 @@ def all_incomes(request):
     p = Paginator(earns, 15)
     page = request.GET.get('page')
     earns = p.get_page(page)
+    if request.method == 'POST':
+        income_form = IncomeForm(request.POST, initial={'user': user})
+        if income_form.is_valid():
+            income_form.save()
+            return redirect('incomes')
+    else:
+        income_form = IncomeForm(
+            initial={'user': user, 'month': actived_month, 'year': actived_year})
+
     context = {
         'earns': earns,
         'total_earn': total_earn,
@@ -221,6 +261,7 @@ def all_incomes(request):
         'total_expense': total_expense,
         'monthly_expense': monthly_expense,
         'balance': balance,
+        'income_form': income_form,
     }
     return render(request, 'history/all_incomes.html', context)
 
