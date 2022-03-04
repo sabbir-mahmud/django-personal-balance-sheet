@@ -1,7 +1,7 @@
 ﻿# django-personal-balance-sheet
 You can monitor your income and expenses details with this django application. you won't need to worry about change month or year details. this project can change date automatic. also you don't need to select month and years details.
 # demo user on
-<a href="https://moneybug-history.herokuapp.com/ target="_blank">Moneybug-history</a>
+<a href="https://moneybug-history.herokuapp.com" target="_blank">Moneybug-history</a>
 * username: hyena
 * password: Sm1213543525
 
