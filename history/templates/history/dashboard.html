@@ -41,7 +41,7 @@
             <div class="row row-cols-lg-4 row-cols-sm-1 row-cols-1 g-2 mt-2">
                 <div class="col">
                     <div class="p-3 border bg-success rounded shadow">
-                        <a class="text-decoration-none" href="{% url 'dashboard' %}">
+                        <a class="text-decoration-none" href="{% url 'task_list' %}">
                             <h5 class="text-white text-center">User: </h5>
                         </a>
                         <h5 class="text-white text-center">{{request.user.first_name}} {{request.user.last_name}}</h5>
@@ -74,35 +74,27 @@
                 </div>
                 <div class="col">
                     <div class="p-3 border bg-warning rounded shadow">
-                        <a class="text-decoration-none" href="{% url 'months' %}">
                             <h5 class="text-white text-center">Monthly Income: </h5>
-                        </a>
                         <h5 class="text-white text-center">{% if monthly_earn %}{{monthly_earn}}{% else %}0{% endif %}
                         </h5>
                     </div>
                 </div>
                 <div class="col">
                     <div class="p-3 border bg-warning rounded shadow">
-                        <a class="text-decoration-none" href="{% url 'months' %}">
                             <h5 class="text-white text-center">Prev Month Income: </h5>
-                        </a>
                         <h5 class="text-white text-center">{% if prev_monthly_income %}{{prev_monthly_income}}{% else %}0{% endif %}
                         </h5>
                     </div>
                 </div>
                 <div class="col">
                     <div class="p-3 border bg-danger rounded shadow">
-                        <a class="text-decoration-none" href="{% url 'years' %}">
                             <h5 class="text-white text-center">Monthly Expense: </h5>
-                        </a>
                         <h5 class="text-white text-center">{{monthly_expense}}</h5>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="p-3 border bg-danger rounded shadow">
-                        <a class="text-decoration-none" href="{% url 'years' %}">
+                    <div class="p-3 border bg-danger rounded shadow">                        
                             <h5 class="text-white text-center">Prev Monthly Expense: </h5>
-                        </a>
                         <h5 class="text-white text-center">{{prev_monthly_expense}}</h5>
                     </div>
                 </div>
@@ -166,20 +158,21 @@
             </div>
     </section>
     <section>
-        <div class="container">
-            <div class="income d-block d-lg-none">
-                <h3 class="text-center text-primary font-monospace my-5"> Add Income Info </h3>
-                <form action="" method="post">
-                    {% csrf_token %}
-                    {{income_form|crispy }}
-                    <input class="btn btn-primary my-3" type="submit" value="Submit">
-                </form>
-            </div>
+        <div class="container">            
             <div class="expense d-block d-lg-none mb-5">
                 <h3 class="text-center text-warning font-monospace my-5"> Add Expenses Info </h3>
                 <form action="" method="post">
                     {% csrf_token %}
                     {{expense_form|crispy }}
+                    <input class="btn btn-primary my-3" type="submit" value="Submit">
+                </form>
+            </div>
+
+            <div class="income d-block d-lg-none">
+                <h3 class="text-center text-primary font-monospace my-5"> Add Income Info </h3>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{income_form|crispy }}
                     <input class="btn btn-primary my-3" type="submit" value="Submit">
                 </form>
             </div>
